@@ -94,7 +94,7 @@ async fn handle_noise_filter_socket(socket: WebSocket) {
                             })
                             .unwrap_or_else(|_| r#"{"error":"Failed to serialize error"}"#.to_string());
 
-                            if let Err(e) = sender.send(Message::Text(error_msg)).await {
+                            if let Err(e) = sender.send(Message::Text(error_msg.into())).await {
                                 error!("Failed to send error message: {}", e);
                                 break;
                             }
@@ -117,7 +117,7 @@ async fn handle_noise_filter_socket(socket: WebSocket) {
                         })
                         .unwrap_or_else(|_| r#"{"error":"Failed to serialize error"}"#.to_string());
 
-                        if let Err(e) = sender.send(Message::Text(error_msg)).await {
+                        if let Err(e) = sender.send(Message::Text(error_msg.into())).await {
                             error!("Failed to send error message: {}", e);
                             break;
                         }
@@ -125,8 +125,6 @@ async fn handle_noise_filter_socket(socket: WebSocket) {
                 }
             }
             Ok(Message::Binary(data)) => {
-                debug!("Received binary audio data: {} bytes", data.len());
-
                 // Check if configured
                 let sample_rate = {
                     let state_guard = state.read().await;
@@ -136,7 +134,7 @@ async fn handle_noise_filter_socket(socket: WebSocket) {
                         })
                         .unwrap_or_else(|_| r#"{"error":"Failed to serialize error"}"#.to_string());
 
-                        if let Err(e) = sender.send(Message::Text(error_msg)).await {
+                        if let Err(e) = sender.send(Message::Text(error_msg.into())).await {
                             error!("Failed to send error message: {}", e);
                             break;
                         }
@@ -145,16 +143,10 @@ async fn handle_noise_filter_socket(socket: WebSocket) {
                     state_guard.sample_rate.unwrap()
                 };
 
-                // Process audio through noise filter
+                // Process audio through DeepFilterNet
                 let pcm = Bytes::from(data);
                 match reduce_noise_async(pcm, sample_rate).await {
                     Ok(processed_audio) => {
-                        debug!(
-                            "Processed audio: {} bytes -> {} bytes",
-                            data.len(),
-                            processed_audio.len()
-                        );
-
                         // Send processed audio back as binary
                         if let Err(e) = sender.send(Message::Binary(processed_audio.into())).await {
                             error!("Failed to send processed audio: {}", e);
@@ -168,7 +160,7 @@ async fn handle_noise_filter_socket(socket: WebSocket) {
                         })
                         .unwrap_or_else(|_| r#"{"error":"Failed to serialize error"}"#.to_string());
 
-                        if let Err(e) = sender.send(Message::Text(error_msg)).await {
+                        if let Err(e) = sender.send(Message::Text(error_msg.into())).await {
                             error!("Failed to send error message: {}", e);
                             break;
                         }
