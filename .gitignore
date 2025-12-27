@@ -13,3 +13,5 @@ vertex.json
 libonnxruntime.so
 onnxruntime/
 dist/
+web/node_modules/
+web/dist/

@@ -423,6 +423,7 @@ pub mod config_handler;
 pub mod error;
 pub mod handler;
 pub mod messages;
+pub mod noise_filter_handler;
 pub mod processor;
 pub mod state;
 
@@ -433,4 +434,5 @@ mod tests;
 pub use config::{LiveKitWebSocketConfig, STTWebSocketConfig, TTSWebSocketConfig};
 pub use handler::ws_voice_handler;
 pub use messages::{IncomingMessage, OutgoingMessage, ParticipantDisconnectedInfo, UnifiedMessage};
+pub use noise_filter_handler::noise_filter_handler;
 pub use state::ConnectionState;
